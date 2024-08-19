@@ -11,7 +11,8 @@ public class GroundMapGenerator : MonoBehaviour
     public Tile GroundTile;
     public int Height;
     public int Width;
-    public float noiseFrequency = 100f;
+
+    public int scale;
     public float noiseThreshold = 0.5f;
 
     public void Start()
@@ -41,10 +42,10 @@ public class GroundMapGenerator : MonoBehaviour
                 float posX = j * tileSizeX + offset.x;
                 float posY = i * tileSizeY + offset.y;
 
-                float xCoord = (float) j / Width;
-                float yCoord = (float) i / Height;
+                float xCoord = (float) j / Width * scale;
+                float yCoord = (float) i / Height * scale;
 
-                float groundValue = Mathf.PerlinNoise(xCoord / noiseFrequency, yCoord / noiseFrequency);
+                float groundValue = Mathf.PerlinNoise(xCoord, yCoord);
 
                 bool isGround = groundValue < noiseThreshold;
 
