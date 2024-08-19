@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -13,16 +14,28 @@ public class GroundMapGenerator : MonoBehaviour
     public int Width;
 
     public int scale;
+
+    [SerializeField, Range(0f, 1f)]
     public float noiseThreshold = 0.5f;
+
+    [SerializeField, Range(0, 8)]
+    public int octaves = 4;
+    public float persistence = 0.5f;
+    public float lacunarity = 2.0f;
+
+    public bool autoUpdate;
 
     public void Start()
     {
         GenerateGroundMap();
     }
 
-    // PerlinNoise Map Generator
+    // PerlinNoise Map Generator with Octaves, Persistence, and Lacunarity
     public void GenerateGroundMap()
     {
+        // Limpa a Tilemap antes de gerar um novo mapa
+        GroundMap.ClearAllTiles();
+
         // Obtenha a escala e posição do BaseMap
         Vector3 baseMapScale = BaseMap.transform.localScale;
         Vector3 baseMapPosition = BaseMap.transform.position;
@@ -45,7 +58,29 @@ public class GroundMapGenerator : MonoBehaviour
                 float xCoord = (float) j / Width * scale;
                 float yCoord = (float) i / Height * scale;
 
-                float groundValue = Mathf.PerlinNoise(xCoord, yCoord);
+                float groundValue = 0f;
+                float amplitude = 1f;
+                float frequency = 1f;
+                float maxPossibleValue = 0f;
+
+                for (int octave = 0; octave < octaves; octave++)
+                {
+                    float sampleX = xCoord * frequency;
+                    float sampleY = yCoord * frequency;
+
+                    float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+                    groundValue += perlinValue * amplitude;
+
+                    maxPossibleValue += amplitude;
+
+                    amplitude *= persistence;
+                    frequency *= lacunarity;
+                }
+
+                groundValue /= maxPossibleValue;
+
+                // Garante que o valor de groundValue esteja entre 0 e 1
+                groundValue = Mathf.Clamp01((groundValue + 1f) / 2f);
 
                 bool isGround = groundValue < noiseThreshold;
 

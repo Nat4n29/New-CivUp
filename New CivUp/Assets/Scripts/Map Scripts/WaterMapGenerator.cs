@@ -17,7 +17,6 @@ public class WaterMapGenerator : MonoBehaviour
         GenerateWaterMap();
     }
 
-    // PerlinNoise Map Generator
     public void GenerateWaterMap()
     {
         // Obtenha a escala e posição do BaseMap
