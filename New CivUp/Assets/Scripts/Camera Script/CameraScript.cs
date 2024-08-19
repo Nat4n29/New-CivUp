@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraScript : MonoBehaviour
 {
-    private MapGenerator mapGenerator;
+    private WaterMapGenerator waterMapGenerator;
 
     [SerializeField]
     private Camera cam;
@@ -24,7 +24,7 @@ public class CameraScript : MonoBehaviour
 
     private void Start()
     {
-        mapGenerator = FindAnyObjectByType<MapGenerator>();
+        waterMapGenerator = FindAnyObjectByType<WaterMapGenerator>();
         cam = Camera.main;
         targetZoom = cam.orthographicSize;
 

@@ -4,24 +4,23 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class MapGenerator : MonoBehaviour
+public class GroundMapGenerator : MonoBehaviour
 {
     public GameObject BaseMap;
-    public Tilemap WaterMap;
-    public Tile WaterTile;
+    public Tilemap GroundMap;
+    public Tile GroundTile;
     public int Height;
     public int Width;
-
-    [SerializeField] private float noiseFrequency;
-    [SerializeField] private float noiseTreshold;
+    public float noiseFrequency = 100f;
+    public float noiseThreshold = 0.5f;
 
     public void Start()
     {
-        GenerateMap();
+        GenerateGroundMap();
     }
 
     // PerlinNoise Map Generator
-    public void GenerateMap()
+    public void GenerateGroundMap()
     {
         // Obtenha a escala e posição do BaseMap
         Vector3 baseMapScale = BaseMap.transform.localScale;
@@ -42,8 +41,17 @@ public class MapGenerator : MonoBehaviour
                 float posX = j * tileSizeX + offset.x;
                 float posY = i * tileSizeY + offset.y;
 
-                Vector3Int tilePosition = WaterMap.WorldToCell(new Vector3(posX, posY, 0));
-                WaterMap.SetTile(tilePosition, WaterTile);
+                float xCoord = (float) j / Width;
+                float yCoord = (float) i / Height;
+
+                float groundValue = Mathf.PerlinNoise(xCoord / noiseFrequency, yCoord / noiseFrequency);
+
+                bool isGround = groundValue < noiseThreshold;
+
+                if (isGround) continue;
+
+                Vector3Int tilePosition = GroundMap.WorldToCell(new Vector3(posX, posY, 0));
+                GroundMap.SetTile(tilePosition, GroundTile);
             }
         }
     }
