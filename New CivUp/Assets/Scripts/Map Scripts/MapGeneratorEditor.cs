@@ -17,5 +17,9 @@ public class MapGeneratorEditor : Editor {
 		if (GUILayout.Button ("Generate")) {
 			mapGen.GenerateGroundMap ();
 		}
+
+		if (GUILayout.Button ("Clear Map")) {
+			mapGen.GroundMap.ClearAllTiles();
+		}
 	}
 }

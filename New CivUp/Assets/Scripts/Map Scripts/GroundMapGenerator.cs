@@ -1,4 +1,4 @@
-using System;
+//using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -9,20 +9,29 @@ public class GroundMapGenerator : MonoBehaviour
 {
     public GameObject BaseMap;
     public Tilemap GroundMap;
-    public Tile GroundTile;
+
     public int Height;
     public int Width;
-
     public int scale;
 
+    //Ground
+    public Tile GroundTile;
     [SerializeField, Range(0f, 1f)]
-    public float noiseThreshold = 0.5f;
+    public float groundNoiseThreshold = 0.5f;
 
+    //Florest
+    public Tile FlorestTile;
+    [SerializeField, Range(0f, 1f)]
+    public float florestNoiseThreshold = 0.5f;
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [SerializeField, Range(0, 8)]
     public int octaves = 4;
     public float persistence = 0.5f;
     public float lacunarity = 2.0f;
-
+    private float seedX = 0f;
+    private float seedY = 0f;
+    /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public bool autoSeed;
     public bool autoUpdate;
 
     public void Start()
@@ -33,6 +42,12 @@ public class GroundMapGenerator : MonoBehaviour
     // PerlinNoise Map Generator with Octaves, Persistence, and Lacunarity
     public void GenerateGroundMap()
     {
+        if (autoSeed)
+        {
+            seedX = Random.Range(0f, 100f);
+            seedY = Random.Range(0f, 100f);
+        }
+
         // Limpa a Tilemap antes de gerar um novo mapa
         GroundMap.ClearAllTiles();
 
@@ -55,8 +70,8 @@ public class GroundMapGenerator : MonoBehaviour
                 float posX = j * tileSizeX + offset.x;
                 float posY = i * tileSizeY + offset.y;
 
-                float xCoord = (float) j / Width * scale;
-                float yCoord = (float) i / Height * scale;
+                float xCoord = (float)j / Width * scale + seedX;
+                float yCoord = (float)i / Height * scale + seedY;
 
                 float groundValue = 0f;
                 float amplitude = 1f;
@@ -82,12 +97,20 @@ public class GroundMapGenerator : MonoBehaviour
                 // Garante que o valor de groundValue esteja entre 0 e 1
                 groundValue = Mathf.Clamp01((groundValue + 1f) / 2f);
 
-                bool isGround = groundValue < noiseThreshold;
-
-                if (isGround) continue;
+                bool isGround = groundValue > groundNoiseThreshold;
+                bool isFlorest = groundValue >= florestNoiseThreshold;
 
                 Vector3Int tilePosition = GroundMap.WorldToCell(new Vector3(posX, posY, 0));
-                GroundMap.SetTile(tilePosition, GroundTile);
+
+                if (isGround)
+                {
+                    GroundMap.SetTile(tilePosition, GroundTile);
+                }
+
+                if (isFlorest)
+                {
+                    GroundMap.SetTile(tilePosition, FlorestTile);
+                }
             }
         }
     }
