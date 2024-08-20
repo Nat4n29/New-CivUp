@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Florest
+  m_Name: Ground_1
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: -2135585597343286014, guid: 2dfe9ee6d4c9c584f839c47778107db6, type: 3}
-  m_Color: {r: 0.045226738, g: 0.5566038, b: 0.03938234, a: 1}
+  m_Sprite: {fileID: 458283616, guid: e85df8f13a281394d96b912b511f8024, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
     e01: 0

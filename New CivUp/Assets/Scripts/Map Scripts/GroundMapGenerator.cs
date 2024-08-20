@@ -18,18 +18,17 @@ public class GroundMapGenerator : MonoBehaviour
     public Tile GroundTile;
     [SerializeField, Range(0f, 1f)]
     public float groundNoiseThreshold = 0.5f;
+    public float groundValue;
 
-    //Florest
-    public Tile FlorestTile;
-    [SerializeField, Range(0f, 1f)]
-    public float florestNoiseThreshold = 0.5f;
+    public TypeTerrain[] _typeTerrain;
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     [SerializeField, Range(0, 8)]
     public int octaves = 4;
     public float persistence = 0.5f;
     public float lacunarity = 2.0f;
-    private float seedX = 0f;
-    private float seedY = 0f;
+    public float SeedX { get; set; } = 0f;
+    public float SeedY { get; set; } = 0f;
     /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public bool autoSeed;
     public bool autoUpdate;
@@ -44,8 +43,8 @@ public class GroundMapGenerator : MonoBehaviour
     {
         if (autoSeed)
         {
-            seedX = Random.Range(0f, 100f);
-            seedY = Random.Range(0f, 100f);
+            SeedX = Random.Range(0f, 100f);
+            SeedY = Random.Range(0f, 100f);
         }
 
         // Limpa a Tilemap antes de gerar um novo mapa
@@ -70,10 +69,10 @@ public class GroundMapGenerator : MonoBehaviour
                 float posX = j * tileSizeX + offset.x;
                 float posY = i * tileSizeY + offset.y;
 
-                float xCoord = (float)j / Width * scale + seedX;
-                float yCoord = (float)i / Height * scale + seedY;
+                float xCoord = (float)j / Width * scale + SeedX;
+                float yCoord = (float)i / Height * scale + SeedY;
 
-                float groundValue = 0f;
+                groundValue = 0f;
                 float amplitude = 1f;
                 float frequency = 1f;
                 float maxPossibleValue = 0f;
@@ -98,7 +97,6 @@ public class GroundMapGenerator : MonoBehaviour
                 groundValue = Mathf.Clamp01((groundValue + 1f) / 2f);
 
                 bool isGround = groundValue > groundNoiseThreshold;
-                bool isFlorest = groundValue >= florestNoiseThreshold;
 
                 Vector3Int tilePosition = GroundMap.WorldToCell(new Vector3(posX, posY, 0));
 
@@ -107,11 +105,23 @@ public class GroundMapGenerator : MonoBehaviour
                     GroundMap.SetTile(tilePosition, GroundTile);
                 }
 
-                if (isFlorest)
+                for (int x = 0; x < _typeTerrain.Length; x++)
                 {
-                    GroundMap.SetTile(tilePosition, FlorestTile);
+                    if (groundValue > _typeTerrain[x].Altitude)
+                    {
+                        GroundMap.SetTile(tilePosition, _typeTerrain[x].TerrainTile);
+                    }
                 }
             }
         }
     }
+}
+
+[System.Serializable]
+public struct TypeTerrain
+{
+    public string Name;
+    public Tile TerrainTile;
+    [SerializeField, Range(0f, 1f)]
+    public float Altitude;
 }

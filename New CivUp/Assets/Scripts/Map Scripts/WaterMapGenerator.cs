@@ -12,8 +12,16 @@ public class WaterMapGenerator : MonoBehaviour
     public int Height;
     public int Width;
 
+    public float WaterAltitude;
+
+    public TypeWater[] _typeWater;
+
+    GroundMapGenerator _groundMapGenerator;
+
     public void Start()
     {
+        _groundMapGenerator = FindAnyObjectByType<GroundMapGenerator>();
+
         GenerateWaterMap();
     }
 
@@ -38,9 +46,59 @@ public class WaterMapGenerator : MonoBehaviour
                 float posX = j * tileSizeX + offset.x;
                 float posY = i * tileSizeY + offset.y;
 
+                float xCoord = (float)j / Width * _groundMapGenerator.scale + _groundMapGenerator.SeedX;
+                float yCoord = (float)i / Height * _groundMapGenerator.scale + _groundMapGenerator.SeedY;
+
+                _groundMapGenerator.groundValue = 0f;
+                float amplitude = 1f;
+                float frequency = 1f;
+                float maxPossibleValue = 0f;
+
+                for (int octave = 0; octave < _groundMapGenerator.octaves; octave++)
+                {
+                    float sampleX = xCoord * frequency;
+                    float sampleY = yCoord * frequency;
+
+                    float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
+                    _groundMapGenerator.groundValue += perlinValue * amplitude;
+
+                    maxPossibleValue += amplitude;
+
+                    amplitude *= _groundMapGenerator.persistence;
+                    frequency *= _groundMapGenerator.lacunarity;
+                }
+
+                _groundMapGenerator.groundValue /= maxPossibleValue;
+
+                // Garante que o valor de _groundMapGenerator.groundValue esteja entre 0 e 1
+                _groundMapGenerator.groundValue = Mathf.Clamp01((_groundMapGenerator.groundValue + 1f) / 2f);
+
+                bool isWater = _groundMapGenerator.groundValue > WaterAltitude;
+
                 Vector3Int tilePosition = WaterMap.WorldToCell(new Vector3(posX, posY, 0));
-                WaterMap.SetTile(tilePosition, WaterTile);
+
+                if (isWater)
+                {
+                    WaterMap.SetTile(tilePosition, WaterTile);
+                }
+
+                for (int x = 0; x < _typeWater.Length; x++)
+                {
+                    if (_groundMapGenerator.groundValue > _typeWater[x].Altitude)
+                    {
+                        WaterMap.SetTile(tilePosition, _typeWater[x].WaterType);
+                    }
+                }
             }
         }
     }
+}
+
+[System.Serializable]
+public struct TypeWater
+{
+    public string Name;
+    public Tile WaterType;
+    [SerializeField, Range(0f, 0.52f)]
+    public float Altitude;
 }
