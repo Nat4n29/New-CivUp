@@ -23,6 +23,7 @@ public class ProvinceEditor : MonoBehaviour
     public Tile clickTile;
     private Tile defaultTile;
     private Vector3Int defaultTilePosition;
+
     void Start()
     {
         provinceGenerator = FindAnyObjectByType<ProvinceGenerator>();
@@ -31,7 +32,7 @@ public class ProvinceEditor : MonoBehaviour
         CityMap = provinceGenerator.CityMap;
     }
 
-    void Update()
+    public void Update()
     {
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         tilePos = ProvinceMap.WorldToCell(mouseWorldPos);
@@ -46,12 +47,22 @@ public class ProvinceEditor : MonoBehaviour
 
     public void ProvincePanelInfo()
     {
-        Text text = ProvinceInfo.transform.Find("Id text").GetComponent<Text>();
+        Text IdText = ProvinceInfo.transform.Find("Id text").GetComponent<Text>();
+        Text CityIdText = ProvinceInfo.transform.Find("City_ID text").GetComponent<Text>();
         bool isActived = ProvinceInfo.activeSelf;
 
         if (isActived)
         {
-            text.text = $"Province ID: {provinceGenerator._provinces.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition).Id}";
+            IdText.text = $"Province ID: {provinceGenerator._provinces.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition).Id}";
+
+            if (CityMap.HasTile(defaultTilePosition))
+            {
+                CityIdText.text = $"City ID: {provinceGenerator._cities.FirstOrDefault(c => c.Position == defaultTilePosition).Id}";
+            }
+            else
+            {
+                CityIdText.text = "Not has city";
+            }
         }
 
     }
@@ -87,7 +98,7 @@ public class ProvinceEditor : MonoBehaviour
 
                 if (matchingProvince != null)
                 {
-                    Debug.Log($"ID = {matchingProvince.Id}");
+                    Debug.Log($"ID = {matchingProvince.Id} {matchingProvince.ProvincePosition}");
                 }
                 else
                 {
@@ -104,14 +115,16 @@ public class ProvinceEditor : MonoBehaviour
 
     public void CreateCity()
     {
-        
-        
         CityMap.SetTile(defaultTilePosition, cityTile);
 
         var _province = provinceGenerator._provinces.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition);
-    
-        provinceGenerator._cities.Add(new City(provinceGenerator._cities.Count + 1, "Nome Cidade", 50, _province));
 
-        //Debug.Log($"City Id: {provinceGenerator._cities.FirstOrDefault(c => c.Position == defaultTilePosition).Id}");
+        int cityId = provinceGenerator._cities.Count;
+
+        City newCity = new City(cityId + 1, "Nome Cidade", defaultTilePosition, 50, _province);
+
+        provinceGenerator.AddCity(newCity);
+
+        Debug.Log($"City Id: {newCity.Id}");
     }
 }

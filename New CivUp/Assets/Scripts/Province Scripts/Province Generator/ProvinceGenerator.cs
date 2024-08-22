@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +13,9 @@ public class ProvinceGenerator : MonoBehaviour
     GroundMapGenerator _groundMapGenerator;
     List<Country> _countries = new List<Country>();
     List<State> _states = new List<State>();
+    [SerializeField]
     public List<City> _cities = new List<City>();
+    [SerializeField]
     public List<Province> _provinces = new List<Province>();
 
     public Tilemap ProvinceMap;
@@ -46,8 +49,6 @@ public class ProvinceGenerator : MonoBehaviour
 
         // Ajuste o offset para começar a gerar os tiles de forma alinhada ao BaseMap
         Vector3 offset = new Vector3(baseMapPosition.x - baseMapScale.x / 2, baseMapPosition.y - baseMapScale.y / 2, 0);
-
-        int provinceId = 0;
 
         for (int i = 0; i < Height; i++)
         {
@@ -87,16 +88,21 @@ public class ProvinceGenerator : MonoBehaviour
                 bool isProvince = _groundMapGenerator.groundValue > _groundMapGenerator.groundNoiseThreshold;
 
                 Vector3Int tilePosition = ProvinceMap.WorldToCell(new Vector3(posX, posY, 0));
-                
+
                 //Province
                 if (isProvince)
                 {
                     ProvinceMap.SetTile(tilePosition, tileProv);
+                    int provinceId = _provinces.Count;
 
-                    _provinces.Add(new Province(provinceId, tilePosition));
-                    provinceId++;
+                    _provinces.Add(new Province(provinceId + 1, tilePosition));
                 }
             }
         }
+    }
+
+    public void AddCity(City city)
+    {
+        _cities.Add(city);
     }
 }
