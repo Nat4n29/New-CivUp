@@ -5,14 +5,15 @@ using UnityEngine.Tilemaps;
 
 public class ProvinceGenerator : MonoBehaviour
 {
+    GameObject BaseMap;
     private int Width;
     private int Height;
 
     GroundMapGenerator _groundMapGenerator;
-    Country _country;
-    State _state;
-    City _city;
-    Province _province;
+    List<Country> _countries = new List<Country>();
+    List<State> _states = new List<State>();
+    public List<City> _cities = new List<City>();
+    public List<Province> _provinces = new List<Province>();
 
     public Tilemap ProvinceMap;
     public Tile tileProv;
@@ -21,22 +22,23 @@ public class ProvinceGenerator : MonoBehaviour
     public Tilemap StateMap;
     public Tilemap CountryMap;
 
-    public bool autoUpdate;
-
     public void Start()
     {
         _groundMapGenerator = FindAnyObjectByType<GroundMapGenerator>();
+        BaseMap = _groundMapGenerator.BaseMap;
         Width = _groundMapGenerator.Width;
         Height = _groundMapGenerator.Height;
 
         GenerateProvinceMap();
+
+        Debug.Log($"Provinces: {_provinces.Count}");
     }
 
     public void GenerateProvinceMap()
     {
         // Obtenha a escala e posição do BaseMap
-        Vector3 baseMapScale = _groundMapGenerator.BaseMap.transform.localScale;
-        Vector3 baseMapPosition = _groundMapGenerator.BaseMap.transform.position;
+        Vector3 baseMapScale = BaseMap.transform.localScale;
+        Vector3 baseMapPosition = BaseMap.transform.position;
 
         // Calcule o tamanho do tilemap em tiles
         float tileSizeX = baseMapScale.x / Width;
@@ -44,6 +46,8 @@ public class ProvinceGenerator : MonoBehaviour
 
         // Ajuste o offset para começar a gerar os tiles de forma alinhada ao BaseMap
         Vector3 offset = new Vector3(baseMapPosition.x - baseMapScale.x / 2, baseMapPosition.y - baseMapScale.y / 2, 0);
+
+        int provinceId = 0;
 
         for (int i = 0; i < Height; i++)
         {
@@ -83,10 +87,14 @@ public class ProvinceGenerator : MonoBehaviour
                 bool isProvince = _groundMapGenerator.groundValue > _groundMapGenerator.groundNoiseThreshold;
 
                 Vector3Int tilePosition = ProvinceMap.WorldToCell(new Vector3(posX, posY, 0));
-
+                
+                //Province
                 if (isProvince)
                 {
                     ProvinceMap.SetTile(tilePosition, tileProv);
+
+                    _provinces.Add(new Province(provinceId, tilePosition));
+                    provinceId++;
                 }
             }
         }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class State : MonoBehaviour
+public class State
 {
     public int Id { get; set; }
     public string Name { get; set; }

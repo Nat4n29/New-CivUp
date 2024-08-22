@@ -29,30 +29,3 @@ public class MapGeneratorEditor : Editor
 		}
 	}
 }
-
-[CustomEditor(typeof(ProvinceGenerator))]
-public class ProvinceGeneratorEditor : Editor
-{
-	public override void OnInspectorGUI()
-	{
-		ProvinceGenerator ProvGen = (ProvinceGenerator)target;
-
-		if (DrawDefaultInspector())
-		{
-			if (ProvGen.autoUpdate)
-			{
-				ProvGen.GenerateProvinceMap();
-			}
-		}
-
-		if (GUILayout.Button("Generate"))
-		{
-			ProvGen.GenerateProvinceMap();
-		}
-
-		if (GUILayout.Button("Clear Map"))
-		{
-			ProvGen.ProvinceMap.ClearAllTiles();
-		}
-	}
-}
