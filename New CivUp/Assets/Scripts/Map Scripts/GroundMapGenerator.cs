@@ -9,6 +9,7 @@ public class GroundMapGenerator : MonoBehaviour
 {
     public GameObject BaseMap;
     public Tilemap GroundMap;
+    public Tilemap SubGroundMap;
 
     public int Height;
     public int Width;
@@ -16,6 +17,7 @@ public class GroundMapGenerator : MonoBehaviour
 
     //Ground
     public Tile GroundTile;
+    public Tile SubGroundTile;
     [SerializeField, Range(0f, 1f)]
     public float groundNoiseThreshold = 0.5f;
     public float groundValue;
@@ -103,6 +105,8 @@ public class GroundMapGenerator : MonoBehaviour
                 if (isGround)
                 {
                     GroundMap.SetTile(tilePosition, GroundTile);
+
+                    SubGroundMap.SetTile(tilePosition, SubGroundTile);
                 }
 
                 for (int x = 0; x < _typeTerrain.Length; x++)

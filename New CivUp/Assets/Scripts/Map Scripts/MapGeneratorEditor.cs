@@ -26,6 +26,7 @@ public class MapGeneratorEditor : Editor
 		if (GUILayout.Button("Clear Map"))
 		{
 			mapGen.GroundMap.ClearAllTiles();
+			mapGen.SubGroundMap.ClearAllTiles();
 		}
 	}
 }

@@ -17,8 +17,11 @@ public class ProvinceGenerator : MonoBehaviour
     public List<City> _cities = new List<City>();
     [SerializeField]
     public List<Province> _provinces = new List<Province>();
+    [SerializeField]
+    public List<Province> _waterProvince = new List<Province>();
 
     public Tilemap ProvinceMap;
+    public Tilemap WaterMap;
     public Tile tileProv;
 
     public Tilemap CityMap;
@@ -35,6 +38,7 @@ public class ProvinceGenerator : MonoBehaviour
         GenerateProvinceMap();
 
         Debug.Log($"Provinces: {_provinces.Count}");
+        Debug.Log($"Water Provinces: {_waterProvince.Count}");
     }
 
     public void GenerateProvinceMap()
@@ -94,8 +98,20 @@ public class ProvinceGenerator : MonoBehaviour
                 {
                     ProvinceMap.SetTile(tilePosition, tileProv);
                     int provinceId = _provinces.Count;
-
                     _provinces.Add(new Province(provinceId + 1, tilePosition));
+                    // Remove o tile de água, se existir
+                    WaterMap.SetTile(tilePosition, null);
+                    _waterProvince.RemoveAll(p => p.ProvincePosition == tilePosition);
+                }
+                else
+                {
+                    // Água
+                    if (!ProvinceMap.HasTile(tilePosition))
+                    {
+                        WaterMap.SetTile(tilePosition, tileProv);
+                        int waterProvinceId = _waterProvince.Count;
+                        _waterProvince.Add(new Province(waterProvinceId + 1, tilePosition));
+                    }
                 }
             }
         }
