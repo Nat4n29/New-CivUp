@@ -7,6 +7,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class ProvinceEditor : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class ProvinceEditor : MonoBehaviour
     public Tile cityTile;
 
     public GameObject ProvinceInfo;
+    public GameObject FindButton;
 
     public Camera mainCamera;
 
@@ -49,24 +51,19 @@ public class ProvinceEditor : MonoBehaviour
 
     public void ProvincePanelInfo()
     {
-        Text IdText = ProvinceInfo.transform.Find("Id text").GetComponent<Text>();
-        Text CityIdText = ProvinceInfo.transform.Find("City_ID text").GetComponent<Text>();
+        TextMeshProUGUI IdText = ProvinceInfo.transform.Find("Id text").GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI CityIdText = ProvinceInfo.transform.Find("City_ID text").GetComponent<TextMeshProUGUI>();
         bool isActived = ProvinceInfo.activeSelf;
 
         if (isActived)
         {
-            if(ProvinceMap.HasTile(defaultTilePosition))
-            {
-                IdText.text = $"Province ID: {provinceGenerator._provinces.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition).Id}";
-            }
-            else
-            {
-                IdText.text = "Not has province";
-            }
-
-            if(WaterMap.HasTile(defaultTilePosition))
+            if (WaterMap.HasTile(defaultTilePosition))
             {
                 IdText.text = $"Water ID: {provinceGenerator._waterProvince.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition).Id}";
+            }
+            else if (ProvinceMap.HasTile(defaultTilePosition))
+            {
+                IdText.text = $"Province ID: {provinceGenerator._provinces.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition).Id}";
             }
             else
             {
@@ -130,16 +127,83 @@ public class ProvinceEditor : MonoBehaviour
 
     public void CreateCity()
     {
-        CityMap.SetTile(defaultTilePosition, cityTile);
+        if (!WaterMap.HasTile(defaultTilePosition))
+        {
+            CityMap.SetTile(defaultTilePosition, cityTile);
 
-        var _province = provinceGenerator._provinces.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition);
+            var _province = provinceGenerator._provinces.FirstOrDefault(p => p.ProvincePosition == defaultTilePosition);
 
-        int cityId = provinceGenerator._cities.Count;
+            int cityId = provinceGenerator._cities.Count;
 
-        City newCity = new City(cityId + 1, "Nome Cidade", defaultTilePosition, 50, _province);
+            City newCity = new City(cityId + 1, "Nome Cidade", defaultTilePosition, 50, _province);
 
-        provinceGenerator.AddCity(newCity);
+            provinceGenerator.AddCity(newCity);
 
-        Debug.Log($"City Id: {newCity.Id}");
+            Debug.Log($"City Id: {newCity.Id}");
+        }
+    }
+
+    //Find Button System_______________________________________________________________________________________________________
+    public void FindButtonClick()
+    {
+        TMP_InputField findText = FindButton.transform.Find("Find_Panel").Find("InputID").GetComponent<TMP_InputField>();
+        int findTextId = int.Parse(findText.text);
+
+        Debug.Log($"ID found: {findTextId}");
+
+        bool isGroundProvince = provinceGenerator._provinces.Any(p => p.Id == findTextId);
+        bool isWaterProvince = provinceGenerator._waterProvince.Any(w => w.Id == findTextId);
+
+        if (isGroundProvince)
+        {
+            Vector3Int provincePos = provinceGenerator._provinces.FirstOrDefault(p => p.Id == findTextId).ProvincePosition;
+
+            ProvinceInfo.SetActive(true);
+
+            defaultTile = (Tile)ProvinceMap.GetTile(provincePos);
+            ProvinceMap.SetTile(provincePos, clickTile);
+
+            if (defaultTilePosition != provincePos)
+            {
+                if (ProvinceMap.HasTile(defaultTilePosition))
+                {
+                    ProvinceMap.SetTile(defaultTilePosition, defaultTile);
+                }
+            }
+
+            defaultTilePosition = provincePos;
+        }
+
+        else if (isWaterProvince)
+        {
+            Vector3Int waterProvPos = provinceGenerator._waterProvince.FirstOrDefault(w => w.Id == findTextId).ProvincePosition;
+
+            ProvinceInfo.SetActive(true);
+
+            defaultTile = (Tile)ProvinceMap.GetTile(waterProvPos);
+            ProvinceMap.SetTile(waterProvPos, clickTile);
+
+            if (defaultTilePosition != waterProvPos)
+            {
+                if (ProvinceMap.HasTile(defaultTilePosition))
+                {
+                    ProvinceMap.SetTile(defaultTilePosition, defaultTile);
+                }
+            }
+
+            defaultTilePosition = waterProvPos;
+        }
+
+        else
+        {
+            findText.text = "ID not found";
+        }
+    }
+
+    public void ToggleFindPanel()
+    {
+        Transform FindPanel = FindButton.transform.Find("Find_Panel");
+
+        FindPanel.gameObject.SetActive(!FindPanel.gameObject.activeSelf);
     }
 }

@@ -27,6 +27,8 @@ public class WaterMapGenerator : MonoBehaviour
 
     public void GenerateWaterMap()
     {
+        WaterMap.ClearAllTiles();
+        
         // Obtenha a escala e posição do BaseMap
         Vector3 baseMapScale = BaseMap.transform.localScale;
         Vector3 baseMapPosition = BaseMap.transform.position;
@@ -37,6 +39,9 @@ public class WaterMapGenerator : MonoBehaviour
 
         // Ajuste o offset para começar a gerar os tiles de forma alinhada ao BaseMap
         Vector3 offset = new Vector3(baseMapPosition.x - baseMapScale.x / 2, baseMapPosition.y - baseMapScale.y / 2, 0);
+
+        //Gera o Falloff Map
+        float[,] fallOffMap = FallOffGenerator.GenerateFallOff(new Vector3Int(Width, Height, 0), _groundMapGenerator.fallOffStart, _groundMapGenerator.fallOffEnd);
 
         for (int i = 0; i < Height; i++)
         {
@@ -72,6 +77,9 @@ public class WaterMapGenerator : MonoBehaviour
 
                 // Garante que o valor de _groundMapGenerator.groundValue esteja entre 0 e 1
                 _groundMapGenerator.groundValue = Mathf.Clamp01((_groundMapGenerator.groundValue + 1f) / 2f);
+
+                //Aplica o Falloff
+                _groundMapGenerator.groundValue *= fallOffMap[j, i];
 
                 bool isWater = _groundMapGenerator.groundValue > WaterAltitude;
 

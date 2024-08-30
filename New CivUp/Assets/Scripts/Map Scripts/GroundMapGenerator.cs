@@ -31,6 +31,11 @@ public class GroundMapGenerator : MonoBehaviour
     public float lacunarity = 2.0f;
     public float SeedX { get; set; } = 0f;
     public float SeedY { get; set; } = 0f;
+
+    [SerializeField, Range(0, 1)]
+    public float fallOffStart = 0.7f;
+    [SerializeField, Range(0, 1)]
+    public float fallOffEnd = 1f;
     /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public bool autoSeed;
     public bool autoUpdate;
@@ -51,6 +56,7 @@ public class GroundMapGenerator : MonoBehaviour
 
         // Limpa a Tilemap antes de gerar um novo mapa
         GroundMap.ClearAllTiles();
+        SubGroundMap.ClearAllTiles();
 
         // Obtenha a escala e posição do BaseMap
         Vector3 baseMapScale = BaseMap.transform.localScale;
@@ -62,6 +68,9 @@ public class GroundMapGenerator : MonoBehaviour
 
         // Ajuste o offset para começar a gerar os tiles de forma alinhada ao BaseMap
         Vector3 offset = new Vector3(baseMapPosition.x - baseMapScale.x / 2, baseMapPosition.y - baseMapScale.y / 2, 0);
+
+        //Gera o Falloff Map
+        float[,] fallOffMap = FallOffGenerator.GenerateFallOff(new Vector3Int(Width, Height, 0), fallOffStart, fallOffEnd);
 
         for (int i = 0; i < Height; i++)
         {
@@ -98,9 +107,14 @@ public class GroundMapGenerator : MonoBehaviour
                 // Garante que o valor de groundValue esteja entre 0 e 1
                 groundValue = Mathf.Clamp01((groundValue + 1f) / 2f);
 
+                //Aplica o Falloff
+                groundValue *= fallOffMap[j, i];
+
                 bool isGround = groundValue > groundNoiseThreshold;
 
                 Vector3Int tilePosition = GroundMap.WorldToCell(new Vector3(posX, posY, 0));
+
+                //FallOffMap Generator (Borda do mapa)
 
                 if (isGround)
                 {

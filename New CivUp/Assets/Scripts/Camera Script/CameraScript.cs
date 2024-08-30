@@ -16,10 +16,9 @@ public class CameraScript : MonoBehaviour
 
     private Vector3 dragOrigin;
     private Vector3 targetPosition;
-    private float mapMinY, mapMaxY;
+    private float mapMinY, mapMaxY, mapMinX, mapMaxX;
     private MeshRenderer mapRenderer;
     private GameObject mapObjectA;
-    private GameObject mapObjectB;
     private float mapWidth;
 
     private void Start()
@@ -32,17 +31,17 @@ public class CameraScript : MonoBehaviour
         mapRenderer = FindObjectOfType<MeshRenderer>();
         mapMinY = mapRenderer.transform.position.y - mapRenderer.bounds.size.y / 2f;
         mapMaxY = mapRenderer.transform.position.y + mapRenderer.bounds.size.y / 2f;
+        mapMinX = mapRenderer.transform.position.x - mapRenderer.bounds.size.x / 2f;
+        mapMaxX = mapRenderer.transform.position.x + mapRenderer.bounds.size.x / 2f;
         mapObjectA = mapRenderer.gameObject;
         mapWidth = mapRenderer.bounds.size.x;
-        // Instantiate the second map object
-        mapObjectB = Instantiate(mapObjectA, mapObjectA.transform.position + new Vector3(mapWidth, 0f, 0f), Quaternion.identity);
     }
 
     private void Update()
     {
         PanCamera();
         ScrollZoom();
-        CheckMapBounds();
+        ClampCameraToMap();
     }
 
     private void PanCamera()
@@ -63,13 +62,17 @@ public class CameraScript : MonoBehaviour
     private Vector3 ClampCamera(Vector3 targetPosition)
     {
         float camHeight = cam.orthographicSize;
+        float camWidth = cam.orthographicSize * cam.aspect;
 
         float minY = mapMinY + camHeight;
         float maxY = mapMaxY - camHeight;
+        float minX = mapMinX + camWidth;
+        float maxX = mapMaxX - camWidth;
 
         float newY = Mathf.Clamp(targetPosition.y, minY, maxY);
+        float newX = Mathf.Clamp(targetPosition.x, minX, maxX);
 
-        return new Vector3(targetPosition.x, newY, targetPosition.z);
+        return new Vector3(newX, newY, targetPosition.z);
     }
 
     private void ScrollZoom()
@@ -99,31 +102,8 @@ public class CameraScript : MonoBehaviour
         cam.transform.position = ClampCamera(cam.transform.position);
     }
 
-    private void CheckMapBounds()
+    private void ClampCameraToMap()
     {
-        float cameraWidth = cam.orthographicSize * cam.aspect;
-        float cameraX = cam.transform.position.x;
-
-        // Check if the camera has reached the left edge of the current map object
-        if (cameraX - cameraWidth <= mapObjectA.transform.position.x - mapWidth / 2f)
-        {
-            // Transition to the other map object
-            mapObjectB.transform.position = new Vector3(mapObjectA.transform.position.x - mapWidth, mapObjectA.transform.position.y, mapObjectA.transform.position.z);
-            SwapMapObjects();
-        }
-        // Check if the camera has reached the right edge of the current map object
-        else if (cameraX + cameraWidth >= mapObjectA.transform.position.x + mapWidth / 2f)
-        {
-            // Transition to the other map object
-            mapObjectB.transform.position = new Vector3(mapObjectA.transform.position.x + mapWidth, mapObjectA.transform.position.y, mapObjectA.transform.position.z);
-            SwapMapObjects();
-        }
-    }
-
-    private void SwapMapObjects()
-    {
-        GameObject temp = mapObjectA;
-        mapObjectA = mapObjectB;
-        mapObjectB = temp;
+        cam.transform.position = ClampCamera(cam.transform.position);
     }
 }
