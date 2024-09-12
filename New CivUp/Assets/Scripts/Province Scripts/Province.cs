@@ -6,7 +6,7 @@ using UnityEngine;
 public class Province
 {
     public int Id;
-    public Vector3Int ProvincePosition { get; set; }
+    public Vector3Int ProvincePosition;
     public District DistrictType { get; set; }
     public int Population { get; set; }
 

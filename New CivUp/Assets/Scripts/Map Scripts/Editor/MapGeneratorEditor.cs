@@ -2,31 +2,40 @@
 using System.Collections;
 using UnityEditor;
 
-[CustomEditor(typeof(GroundMapGenerator))]
+[CustomEditor(typeof(GeneratorManeger))]
 public class MapGeneratorEditor : Editor
 {
 
+
 	public override void OnInspectorGUI()
 	{
-		GroundMapGenerator mapGen = (GroundMapGenerator)target;
+		GeneratorManeger mapGen = (GeneratorManeger)target;
 
 		if (DrawDefaultInspector())
 		{
 			if (mapGen.autoUpdate)
 			{
-				mapGen.GenerateGroundMap();
+				mapGen.Start();
 			}
 		}
 
 		if (GUILayout.Button("Generate"))
 		{
-			mapGen.GenerateGroundMap();
+			mapGen.Start();
 		}
 
 		if (GUILayout.Button("Clear Map"))
 		{
 			mapGen.GroundMap.ClearAllTiles();
 			mapGen.SubGroundMap.ClearAllTiles();
+
+			mapGen.WaterMap.ClearAllTiles();
+
+			mapGen.ProvinceMap.ClearAllTiles();
+			mapGen.ProvinceWaterMap.ClearAllTiles();
+			mapGen.CityMap.ClearAllTiles();
+			mapGen.StateMap.ClearAllTiles();
+			mapGen.CountryMap.ClearAllTiles();
 		}
 	}
 }
