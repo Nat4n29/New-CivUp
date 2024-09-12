@@ -610,6 +610,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 813513767}
+        m_TargetAssemblyTypeName: ClickScript, Assembly-CSharp
+        m_MethodName: CloseClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &301567077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1732,7 +1744,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 7
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -2024,6 +2036,7 @@ GameObject:
   - component: {fileID: 813513764}
   - component: {fileID: 813513765}
   - component: {fileID: 813513766}
+  - component: {fileID: 813513767}
   m_Layer: 0
   m_Name: Province Editor
   m_TagString: Untagged
@@ -2102,6 +2115,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7451f78a14fe7884bacaaa09297e0c5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &813513767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813513760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ba909d0d070c624c9ceeef34ac32d5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &884381956
@@ -2978,7 +3003,7 @@ MonoBehaviour:
   lacunarity: 2.46
   fallOffStart: 0.65
   fallOffEnd: 1
-  autoSeed: 0
+  autoSeed: 1
   autoUpdate: 0
   GroundTile: {fileID: 11400000, guid: 8d89b71dfa0a6cd46847ff807900be5c, type: 2}
   SubGroundTile: {fileID: 11400000, guid: bbc309ae6e8c5b449a870faba8eca5d2, type: 2}
@@ -2986,19 +3011,19 @@ MonoBehaviour:
   _typeTerrain:
   - Name: Florest_1
     TerrainTile: {fileID: 11400000, guid: cc3f93c25fadcfa43b4f5d4352a0cffe, type: 2}
-    Altitude: 0.54
+    Altitude: 0.545
   - Name: Florest_2
     TerrainTile: {fileID: 11400000, guid: cec5b8aa990bcce4a852b40d4bba003f, type: 2}
-    Altitude: 0.57
+    Altitude: 0.6
   WaterTile: {fileID: 11400000, guid: bcc2705823ae4a64381efee4efb01980, type: 2}
   WaterAltitude: 0
   _typeWater:
   - Name: Ocean_1
     WaterType: {fileID: 11400000, guid: 899e50f6cf111db459409a29f77eed2d, type: 2}
-    Altitude: 0.3
+    Altitude: 0.38
   - Name: Ocean_2
     WaterType: {fileID: 11400000, guid: a3b1b1b8028978b41a2fe1be8ff62728, type: 2}
-    Altitude: 0.4
+    Altitude: 0.435
   RiverMap: {fileID: 0}
   RiverTile: {fileID: 0}
   RiverLength: 10
@@ -3656,33 +3681,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GroundMapGenerator, Assembly-CSharp
-        m_MethodName: GenerateGroundMap
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: WaterMapGenerator, Assembly-CSharp
-        m_MethodName: GenerateWaterMap
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ProvinceGenerator, Assembly-CSharp
-        m_MethodName: GenerateProvinceMap
+      - m_Target: {fileID: 1678309997}
+        m_TargetAssemblyTypeName: GeneratorManeger, Assembly-CSharp
+        m_MethodName: GenerateButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

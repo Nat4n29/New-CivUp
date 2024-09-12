@@ -15,12 +15,14 @@ public class MapGeneratorEditor : Editor
 		{
 			if (mapGen.autoUpdate)
 			{
+				ClearDataProvince(mapGen);
 				mapGen.Start();
 			}
 		}
 
 		if (GUILayout.Button("Generate"))
 		{
+			ClearDataProvince(mapGen);
 			mapGen.Start();
 		}
 
@@ -36,6 +38,17 @@ public class MapGeneratorEditor : Editor
 			mapGen.CityMap.ClearAllTiles();
 			mapGen.StateMap.ClearAllTiles();
 			mapGen.CountryMap.ClearAllTiles();
+
+			ClearDataProvince(mapGen);
 		}
+	}
+
+	void ClearDataProvince(GeneratorManeger mapGen)
+	{
+			mapGen.DataProvince._provinces.Clear();
+			mapGen.DataProvince._waterProvince.Clear();
+			mapGen.DataProvince._cities.Clear();
+			mapGen.DataProvince._states.Clear();
+			mapGen.DataProvince._countries.Clear();
 	}
 }

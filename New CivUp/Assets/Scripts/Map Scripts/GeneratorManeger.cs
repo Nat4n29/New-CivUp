@@ -60,7 +60,7 @@ public class GeneratorManeger : MonoBehaviour
     public Tilemap StateMap;
     public Tilemap CountryMap;
 
-    DataProvince dataProvince;
+    public DataProvince DataProvince { get; set; }
 
     //____________________________________________________________________________________________________________________
     public void Start()
@@ -71,16 +71,27 @@ public class GeneratorManeger : MonoBehaviour
             SeedY = Random.Range(0f, 100f);
         }
 
-        dataProvince = FindAnyObjectByType<DataProvince>();
+        DataProvince = FindAnyObjectByType<DataProvince>();
 
-        GroundMapGenerator.GenerateGroundMap(BaseMap,GroundMap,SubGroundMap,Height,Width,scale,octaves,persistence,lacunarity,SeedX,SeedY,fallOffStart,fallOffEnd,GroundTile,SubGroundTile,groundNoiseThreshold,_typeTerrain);
-        WaterMapGenerator.GenerateWaterMap(BaseMap, WaterMap, Height,Width,scale, octaves, persistence, lacunarity,SeedX,SeedY,fallOffStart,fallOffEnd,WaterAltitude, WaterTile,_typeWater);
-        ProvinceGenerator.GenerateProvinceMap(BaseMap,ProvinceMap,ProvinceWaterMap,CityMap,StateMap,CountryMap,Height,Width,fallOffStart,fallOffEnd,scale,SeedX,SeedY,octaves,persistence,lacunarity,groundNoiseThreshold,tileProv,dataProvince);
+        GroundMapGenerator.GenerateGroundMap(BaseMap, GroundMap, SubGroundMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, GroundTile, SubGroundTile, groundNoiseThreshold, _typeTerrain);
+        WaterMapGenerator.GenerateWaterMap(BaseMap, WaterMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, WaterAltitude, WaterTile, _typeWater);
+        ProvinceGenerator.GenerateProvinceMap(BaseMap, ProvinceMap, ProvinceWaterMap, CityMap, StateMap, CountryMap, Height, Width, fallOffStart, fallOffEnd, scale, SeedX, SeedY, octaves, persistence, lacunarity, groundNoiseThreshold, tileProv, DataProvince);
     }
 
-    void Update()
+    public void GenerateButton()
     {
-        
+        SeedX = Random.Range(0f, 100f);
+        SeedY = Random.Range(0f, 100f);
+
+        DataProvince._cities.Clear();
+        DataProvince._countries.Clear();
+        DataProvince._provinces.Clear();
+        DataProvince._states.Clear();
+        DataProvince._waterProvince.Clear();
+
+        GroundMapGenerator.GenerateGroundMap(BaseMap, GroundMap, SubGroundMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, GroundTile, SubGroundTile, groundNoiseThreshold, _typeTerrain);
+        WaterMapGenerator.GenerateWaterMap(BaseMap, WaterMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, WaterAltitude, WaterTile, _typeWater);
+        ProvinceGenerator.GenerateProvinceMap(BaseMap, ProvinceMap, ProvinceWaterMap, CityMap, StateMap, CountryMap, Height, Width, fallOffStart, fallOffEnd, scale, SeedX, SeedY, octaves, persistence, lacunarity, groundNoiseThreshold, tileProv, DataProvince);
     }
 }
 

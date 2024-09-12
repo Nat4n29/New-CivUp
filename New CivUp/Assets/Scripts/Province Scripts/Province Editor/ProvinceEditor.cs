@@ -47,8 +47,8 @@ public class ProvinceEditor : MonoBehaviour
         if (IsPointerOverUIElement() == false)
         {
             defaultTilePosition = ClickScript.OnClickMouse(tilePos, ProvinceInfo, dataProvince, ProvinceMap, ClickMap, clickTile, defaultTile, defaultTilePosition);
-            InfoPanel.ProvincePanelInfo(generatorManeger, dataProvince, ProvinceInfo, defaultTilePosition);
         }
+        InfoPanel.ProvincePanelInfo(generatorManeger, dataProvince, ProvinceInfo, defaultTilePosition);
     }
 
     // Função que verifica se o cursor está sobre algum elemento UI
@@ -60,7 +60,7 @@ public class ProvinceEditor : MonoBehaviour
     //Find System_________________________________________________________________________________________________________
     public void OnFindButtonClick()
     {
-        FindButton.FindButtonClick(findButton,dataProvince, ProvinceInfo,ProvinceMap,ClickMap,defaultTilePosition,clickTile,defaultTile);
+        defaultTilePosition = FindButton.FindButtonClick(findButton,dataProvince, ProvinceInfo,ProvinceMap,ClickMap,defaultTilePosition,clickTile,defaultTile);
     }
     public void ToggleFindPanel()
     {

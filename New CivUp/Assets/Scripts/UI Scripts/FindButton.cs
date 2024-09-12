@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 public class FindButton : MonoBehaviour
 {
-    public static void FindButtonClick(GameObject findButton, DataProvince dataProvince, GameObject ProvinceInfo,Tilemap ProvinceMap,Tilemap ClickMap,Vector3Int defaultTilePosition,Tile clickTile,Tile defaultTile)
+    public static Vector3Int FindButtonClick(GameObject findButton, DataProvince dataProvince, GameObject ProvinceInfo,Tilemap ProvinceMap,Tilemap ClickMap,Vector3Int defaultTilePosition,Tile clickTile,Tile defaultTile)
     {
         TMP_InputField findText = findButton.transform.Find("Find_Panel").Find("InputID").GetComponent<TMP_InputField>();
         int findTextId = int.Parse(findText.text);
@@ -61,5 +61,7 @@ public class FindButton : MonoBehaviour
         {
             findText.text = "ID not found";
         }
+
+        return defaultTilePosition;
     }
 }

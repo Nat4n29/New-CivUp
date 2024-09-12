@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 
 public class ClickScript : MonoBehaviour
 {
-    public static Vector3Int OnClickMouse(Vector3Int tilePos, GameObject ProvinceInfo, DataProvince dataProvince, Tilemap ProvinceMap, Tilemap ClickMap, Tile clickTile,Tile defaultTile,Vector3Int defaultTilePosition)
+    public static Vector3Int OnClickMouse(Vector3Int tilePos, GameObject ProvinceInfo, DataProvince dataProvince, Tilemap ProvinceMap, Tilemap ClickMap, Tile clickTile, Tile defaultTile, Vector3Int defaultTilePosition)
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -43,5 +43,16 @@ public class ClickScript : MonoBehaviour
         }
 
         return defaultTilePosition;
+    }
+
+    ProvinceEditor provinceEditor;
+    void Start()
+    {
+        provinceEditor = FindAnyObjectByType<ProvinceEditor>();
+    }
+
+    public void CloseClick()
+    {
+        provinceEditor.ClickMap.ClearAllTiles();
     }
 }
