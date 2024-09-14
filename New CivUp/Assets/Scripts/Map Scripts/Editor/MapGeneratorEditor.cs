@@ -32,6 +32,7 @@ public class MapGeneratorEditor : Editor
 			mapGen.SubGroundMap.ClearAllTiles();
 
 			mapGen.WaterMap.ClearAllTiles();
+			mapGen.RiverMap.ClearAllTiles();
 
 			mapGen.ProvinceMap.ClearAllTiles();
 			mapGen.ProvinceWaterMap.ClearAllTiles();
@@ -45,10 +46,13 @@ public class MapGeneratorEditor : Editor
 
 	void ClearDataProvince(GeneratorManeger mapGen)
 	{
+		if (mapGen.DataProvince._provinces.Count != 0)
+		{
 			mapGen.DataProvince._provinces.Clear();
 			mapGen.DataProvince._waterProvince.Clear();
 			mapGen.DataProvince._cities.Clear();
 			mapGen.DataProvince._states.Clear();
 			mapGen.DataProvince._countries.Clear();
+		}
 	}
 }

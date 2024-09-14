@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 public class GeneratorManeger : MonoBehaviour
 {
@@ -46,7 +48,7 @@ public class GeneratorManeger : MonoBehaviour
 
     //River______________________________________________________________________________________________________________
     public Tilemap RiverMap;
-    public Tile RiverTile;
+    public RuleTile RiverTile;
     public int RiverLength = 10; // Comprimento do rio
     [SerializeField, Range(0f, 1f)]
     public float RiverHeight = 0.9f;
@@ -60,7 +62,8 @@ public class GeneratorManeger : MonoBehaviour
     public Tilemap StateMap;
     public Tilemap CountryMap;
 
-    public DataProvince DataProvince { get; set; }
+    [NonSerialized]
+    public DataProvince DataProvince;
 
     //____________________________________________________________________________________________________________________
     public void Start()
@@ -73,7 +76,7 @@ public class GeneratorManeger : MonoBehaviour
 
         DataProvince = FindAnyObjectByType<DataProvince>();
 
-        GroundMapGenerator.GenerateGroundMap(BaseMap, GroundMap, SubGroundMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, GroundTile, SubGroundTile, groundNoiseThreshold, _typeTerrain);
+        GroundMapGenerator.GenerateGroundMap(BaseMap, GroundMap, SubGroundMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, GroundTile, SubGroundTile, groundNoiseThreshold, _typeTerrain, RiverHeight, RiverLength, RiverMap, RiverTile);
         WaterMapGenerator.GenerateWaterMap(BaseMap, WaterMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, WaterAltitude, WaterTile, _typeWater);
         ProvinceGenerator.GenerateProvinceMap(BaseMap, ProvinceMap, ProvinceWaterMap, CityMap, StateMap, CountryMap, Height, Width, fallOffStart, fallOffEnd, scale, SeedX, SeedY, octaves, persistence, lacunarity, groundNoiseThreshold, tileProv, DataProvince);
     }
@@ -89,7 +92,7 @@ public class GeneratorManeger : MonoBehaviour
         DataProvince._states.Clear();
         DataProvince._waterProvince.Clear();
 
-        GroundMapGenerator.GenerateGroundMap(BaseMap, GroundMap, SubGroundMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, GroundTile, SubGroundTile, groundNoiseThreshold, _typeTerrain);
+        GroundMapGenerator.GenerateGroundMap(BaseMap, GroundMap, SubGroundMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, GroundTile, SubGroundTile, groundNoiseThreshold, _typeTerrain,RiverHeight, RiverLength, RiverMap, RiverTile);
         WaterMapGenerator.GenerateWaterMap(BaseMap, WaterMap, Height, Width, scale, octaves, persistence, lacunarity, SeedX, SeedY, fallOffStart, fallOffEnd, WaterAltitude, WaterTile, _typeWater);
         ProvinceGenerator.GenerateProvinceMap(BaseMap, ProvinceMap, ProvinceWaterMap, CityMap, StateMap, CountryMap, Height, Width, fallOffStart, fallOffEnd, scale, SeedX, SeedY, octaves, persistence, lacunarity, groundNoiseThreshold, tileProv, DataProvince);
     }

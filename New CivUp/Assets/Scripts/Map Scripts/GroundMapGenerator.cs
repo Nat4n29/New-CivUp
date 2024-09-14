@@ -1,13 +1,14 @@
-//using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class GroundMapGenerator : MonoBehaviour
 {
-    public static void GenerateGroundMap(GameObject baseMap, Tilemap groundMap, Tilemap subGroundMap, int height, int width, int scale, int octaves, float persistence, float lacunarity, float seedX, float seedY, float fallOffStart, float fallOffEnd, Tile groundTile, Tile subGroundTile, float groundNoiseThreshold, TypeTerrain[] typeTerrain)
+    public static void GenerateGroundMap(GameObject baseMap, Tilemap groundMap, Tilemap subGroundMap, int height, int width, int scale, int octaves, float persistence, float lacunarity, float seedX, float seedY, float fallOffStart, float fallOffEnd, Tile groundTile, Tile subGroundTile, float groundNoiseThreshold, TypeTerrain[] typeTerrain, float RiverHeight, int RiverLength, Tilemap RiverMap, RuleTile RiverTile)
     {
         // Limpa a Tilemap antes de gerar um novo mapa
         groundMap.ClearAllTiles();
@@ -28,7 +29,9 @@ public class GroundMapGenerator : MonoBehaviour
         float[,] fallOffMap = FallOffGenerator.GenerateFallOff(new Vector3Int(width, height, 0), fallOffStart, fallOffEnd);
 
         // Variáveis para armazenar as posições dos tiles mais altos
-        List<Vector3Int> highestPoints = new List<Vector3Int>();
+        List<Tuple<Vector3Int, float>> altituePoints = new List<Tuple<Vector3Int, float>>();
+        List<Tuple<Vector3Int, float>> highestPoints = new List<Tuple<Vector3Int, float>>();
+        List<Tuple<Vector3Int, float>> waterPoints = new List<Tuple<Vector3Int, float>>();
 
         for (int i = 0; i < height; i++)
         {
@@ -77,6 +80,8 @@ public class GroundMapGenerator : MonoBehaviour
                     groundMap.SetTile(tilePosition, groundTile);
 
                     subGroundMap.SetTile(tilePosition, subGroundTile);
+
+                    altituePoints.Add(new Tuple<Vector3Int, float>(tilePosition, groundValue));
                 }
 
                 for (int x = 0; x < typeTerrain.Length; x++)
@@ -84,34 +89,62 @@ public class GroundMapGenerator : MonoBehaviour
                     if (groundValue > typeTerrain[x].Altitude)
                     {
                         groundMap.SetTile(tilePosition, typeTerrain[x].TerrainTile);
+
+                        altituePoints.Add(new Tuple<Vector3Int, float>(tilePosition, groundValue));
                     }
                 }
 
                 // Identifica os pontos mais altos
-                if (groundValue > 0.9f)
+                if (groundValue >= RiverHeight)
                 {
-                    highestPoints.Add(tilePosition);
+                    highestPoints.Add(altituePoints.FirstOrDefault(a => a.Item2 == groundValue));
+                }
+
+                if (groundValue <= groundNoiseThreshold)
+                {
+                    waterPoints.Add(new Tuple<Vector3Int, float>(tilePosition, 0f));
                 }
             }
         }
 
-        // Geração dos rios
-        foreach (Vector3Int startPoint in highestPoints)
+        //Elimina metade dos pontos altos
+        if (highestPoints.Count > 2)
         {
-            //GenerateRiver(startPoint);
+            int halfHighest = (int)(highestPoints.Count - (highestPoints.Count * ((float) 5/100)));
+
+            // Remover metade dos elementos de forma aleatória
+            for (int i = 0; i < halfHighest; i++)
+            {
+                // Obtenha um índice aleatório dentro do intervalo atual da lista
+                int randomIndex = UnityEngine.Random.Range(0, highestPoints.Count);
+                
+                // Remove o item no índice aleatório gerado
+                highestPoints.RemoveAt(randomIndex);
+            }
+        }
+        Debug.Log(highestPoints.Count);
+
+        // Geração dos rios
+        foreach (var startPoint in highestPoints)
+        {
+            Vector3Int position = startPoint.Item1;
+            float altitude = startPoint.Item2;
+
+            GenerateRiver(position, altitude, altituePoints, RiverLength, RiverMap, RiverTile, groundMap, waterPoints);
         }
     }
 
-    /*static void GenerateRiver(Vector3Int startPoint)
+    static void GenerateRiver(Vector3Int startPoint, float altitude, List<Tuple<Vector3Int, float>> altituePoints, int RiverLength, Tilemap RiverMap, RuleTile RiverTile, Tilemap GroundMap, List<Tuple<Vector3Int, float>> waterPoints)
     {
         Vector3Int currentPoint = startPoint;
+
         for (int i = 0; i < RiverLength; i++)
         {
             RiverMap.SetTile(currentPoint, RiverTile);
-
-            // Encontra o vizinho mais baixo em uma cruz (+)
+            
+            // Encontra o vizinho mais baixo
             Vector3Int nextPoint = currentPoint;
-            float lowestValue = groundValue;
+            float lowestValue = altitude;
 
             List<Vector3Int> neighbors = new List<Vector3Int>
             {
@@ -119,28 +152,45 @@ public class GroundMapGenerator : MonoBehaviour
                 new Vector3Int(currentPoint.x - 1, currentPoint.y, currentPoint.z),
                 new Vector3Int(currentPoint.x, currentPoint.y + 1, currentPoint.z),
                 new Vector3Int(currentPoint.x, currentPoint.y - 1, currentPoint.z),
-                new Vector3Int(currentPoint.x + 1, currentPoint.y - 1, currentPoint.z),
-                new Vector3Int(currentPoint.x - 1, currentPoint.y + 1, currentPoint.z)
+                new Vector3Int(currentPoint.x - 1, currentPoint.y + 1, currentPoint.z),
+                new Vector3Int(currentPoint.x - 1, currentPoint.y - 1, currentPoint.z)
             };
 
             foreach (Vector3Int neighbor in neighbors)
             {
-                float neighborValue = GroundMap.GetTile(neighbor) == null ? 0 : groundValue;
+                var neighborTuple = altituePoints.FirstOrDefault(a => a.Item1 == neighbor);
+                var neighborWater = waterPoints.FirstOrDefault(a => a.Item1 == neighbor);
 
-                if (neighborValue < lowestValue)
+                if (neighborTuple != null)
                 {
-                    lowestValue = neighborValue;
+                    float neighborValue = neighborTuple.Item2;
+                    if (neighborValue < lowestValue)
+                    {
+                        lowestValue = neighborValue;
+                        nextPoint = neighbor;
+                    }
+                }
+
+                else if (neighborWater != null)
+                {
                     nextPoint = neighbor;
+                    break;
                 }
             }
 
-            currentPoint = nextPoint;
+            if (nextPoint != null)
+            {
+                currentPoint = nextPoint;
+            }
+
 
             // Se o próximo ponto é um tile de água, pare de gerar o rio
             if (GroundMap.GetTile(currentPoint) == null)
             {
+                RiverMap.SetTile(currentPoint, RiverTile);
                 break;
             }
+            
         }
-    }*/
+    }
 }
